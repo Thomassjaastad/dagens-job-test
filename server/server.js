@@ -73,41 +73,21 @@ app.get('/nearestPrices/:id', (req, res) => {
   const sortedProducts = filterProducts.sort(function (a, b) {
     return a.price - b.price;
   });
-  const absVal = sortedProducts.map((item) => {
+
+  const absVal = sortedProducts.map((item, i) => {
     let diff = Math.abs(product.price - item.price);
-    return diff;
+    return { index: i, value: diff };
+  });
+  absVal.sort(function (a, b) {
+    return a.value - b.value;
   });
 
-  let lowestN = [];
-  let lowestNVal = [];
-
-  const findMinIdx = absVal.indexOf(Math.min(...absVal));
-  const findMinVal = Math.min(...absVal);
-  lowestN.push(findMinIdx);
-  lowestNVal.push(findMinVal);
-
-  for (var n = 0; n < N - 1; n++) {
-    let lowest = Infinity;
-
-    for (var i = 0; i < absVal.length; i++) {
-      if (product.id !== filterProducts[i].id) {
-        if (absVal[i] < lowest && absVal[i] > Math.max(...lowestNVal)) {
-          lowest = absVal[i];
-        }
-      }
-    }
-    lowestNVal.push(lowest);
-    lowestN.push(absVal.indexOf(lowest));
-  }
-
-  const findLowestIndex = lowestN.filter((val) => absVal.indexOf(val));
-
-  const lowestNproducts = filterProducts.filter(
-    (item, index) => item[index] === findLowestIndex
-  );
-  console.log(lowestNproducts);
-  // console.log(lowestNVal);
-  res.json(sortedProducts);
+  const sortedPriceProducts = absVal.map((item) => {
+    return sortedProducts[item.index];
+  });
+  const nPlussOne = parseInt(N) + 1;
+  const nearestN = sortedPriceProducts.slice(0, parseInt(N) + 1);
+  res.json(nearestN);
 });
 
 process.on('SIGINT', function () {

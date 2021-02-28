@@ -85,7 +85,6 @@ app.get('/nearestPrices/:id', (req, res) => {
   const sortedPriceProducts = absVal.map((item) => {
     return sortedProducts[item.index];
   });
-  const nPlussOne = parseInt(N) + 1;
   const nearestN = sortedPriceProducts.slice(0, parseInt(N) + 1);
   res.json(nearestN);
 });
